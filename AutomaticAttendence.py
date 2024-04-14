@@ -13,25 +13,25 @@ import os
 def load_known_faces():
     known_face_encoding = []
     known_face_name = []
-    known_face_email = {}  # Dictionary to store email addresses
+    known_face_email = {}  
 
-    # Load known faces
+    
     for image_path in glob.glob("C:/Users/ASUS/Pictures/Camera Roll/*.jpg"):
         image = face_recognition.load_image_file(image_path)
         face_encodings = face_recognition.face_encodings(image)
         
-        # Check if any faces are detected in the image
+        
         if len(face_encodings) == 0:
             print("No face detected in", image_path)
-            continue  # Skip processing this image
+            continue  
         
         encoding = face_encodings[0]
         known_face_encoding.append(encoding)
         name = image_path.split("\\")[-1].split(".")[0]
         known_face_name.append(name)
-        known_face_email[name] = ""  # Initialize email as empty string
+        known_face_email[name] = ""  
 
-    # Check if email addresses file exists, and load email addresses if it does
+    
     if os.path.exists("known_face_email.json"):
         with open("known_face_email.json", "r") as file:
             known_face_email = json.load(file)
@@ -46,8 +46,7 @@ def record_attendance(name, lnwriter, attendance_data, known_face_email):
     current_time = datetime.now().strftime("%H-%M-%S")
     lnwriter.writerow([name, current_time])
     print(f"Attendance recorded for: {name} at {current_time}")
-    attendance_data[name] = attendance_data.get(name, 0) + 1  # Update attendance data
-    # Send email notification with attendance summary
+    attendance_data[name] = attendance_data.get(name, 0) + 1  
     if known_face_email[name]:
         send_email_notification(f"Attendance recorded for: {name} at {current_time}", known_face_email[name])
 
@@ -58,20 +57,20 @@ def generate_attendance_summary(attendance_data):
     return summary
 
 def send_email_notification(body, receiver_email):
-    # Configure email settings
+   
     sender_email = "thapliyalpuneet84@gmail.com"
     password = "dmvd mazj wlij yzxq"
 
-    # Create message
+   
     message = MIMEMultipart()
     message["From"] = sender_email
     message["To"] = receiver_email
     message["Subject"] = "Attendance for the day"
 
-    # Add body to email
+    
     message.attach(MIMEText(body, "plain"))
 
-    # Connect to SMTP server and send email
+   
     with smtplib.SMTP("smtp.gmail.com", 587) as server:
         server.starttls()
         server.login(sender_email, password)
@@ -87,11 +86,11 @@ def add_new_user(known_face_encoding, known_face_name, known_face_email):
         encoding = face_recognition.face_encodings(image)[0]
         known_face_encoding.append(encoding)
         known_face_name.append(name)
-        known_face_email[name] = {"image_path": image_path, "email": email}  # Store image path and email with respect to the name
+        known_face_email[name] = {"image_path": image_path, "email": email}  
         print("New user", name, "added successfully.")
     except Exception as e:
         print("Error:", e)
-        add_new_user(known_face_encoding, known_face_name, known_face_email)  # Ask again if an error occurs
+        add_new_user(known_face_encoding, known_face_name, known_face_email)  
 
 
 
@@ -110,7 +109,7 @@ def main():
     f = open(current_date + '.csv', 'w+', newline='')
     lnwriter = csv.writer(f)
 
-    attendance_data = {}  # Dictionary to store attendance data
+    attendance_data = {}  
 
     while True:
         _, frame = video_capture.read()
@@ -131,8 +130,8 @@ def main():
 
             if matches[best_match_index]:
                 name = known_face_name[best_match_index]
-                email = known_face_email[name]
-                if name not in attendance_data:  # Check if attendance has already been recorded for this face
+                known_face_email[name] = email
+                if name not in attendance_data:  
                     face_names.append(name)
                     record_attendance(name, lnwriter, attendance_data, known_face_email)
 
@@ -146,18 +145,18 @@ def main():
 
     video_capture.release()
     cv2.destroyAllWindows()
-    f.close()  # Close the CSV file after the main loop
+    f.close()  
 
-    # Generate attendance summary
+ 
     summary = generate_attendance_summary(attendance_data)
     print(summary)
 
-    # Send email notification with attendance summary
+    
     for name, email in known_face_email.items():
         if email:
-            send_email_notification(summary, email)  # Send email to the user's email address
+            send_email_notification(summary, email)  
 
-    # Prompt user to add a new user again if desired
+   
     while True:
         add_user_choice = input("Do you want to add another new user? (yes/no): ").lower()
         if add_user_choice == "yes":
