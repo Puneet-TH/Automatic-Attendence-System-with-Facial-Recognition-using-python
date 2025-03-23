@@ -58,8 +58,8 @@ def generate_attendance_summary(attendance_data):
 
 def send_email_notification(body, receiver_email):
    
-    sender_email = "thapliyalpuneet84@gmail.com"
-    password = "dmvd mazj wlij yzxq"
+    sender_email = "your email"
+    password = "your app password"
 
    
     message = MIMEMultipart()
