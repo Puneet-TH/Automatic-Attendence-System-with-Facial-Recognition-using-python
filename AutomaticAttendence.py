@@ -16,7 +16,7 @@ def load_known_faces():
     known_face_email = {}  
 
     
-    for image_path in glob.glob("C:/Users/ASUS/Pictures/Camera Roll/*.jpg"):
+    for image_path in glob.glob(" paste path where your images are with images name as your real name "):
         image = face_recognition.load_image_file(image_path)
         face_encodings = face_recognition.face_encodings(image)
         
